@@ -1,0 +1,10 @@
+{"id":"A0001","primary_entity":"Nvidia","primary_entity_type":"company","secondary_entity":"Run:ai","action_type":"acquisition","amount_usd":700000000,"date":"2024-04-24","jurisdiction":null}
+{"id":"A0002","primary_entity":"Microsoft","primary_entity_type":"company","secondary_entity":"OpenAI","action_type":"partnership","amount_usd":10000000000,"date":"2023-01-23","jurisdiction":"US"}
+{"id":"A0003","primary_entity":"Citigroup","primary_entity_type":"company","secondary_entity":"UK Financial Conduct Authority","action_type":"fine","amount_usd":61600000,"date":"2023-11-14","jurisdiction":"UK"}
+{"id":"A0004","primary_entity":"Epic Games","primary_entity_type":"company","secondary_entity":"FTC","action_type":"fine","amount_usd":520000000,"date":"2022-12-01","jurisdiction":"US"}
+{"id":"A0005","primary_entity":"Amazon","primary_entity_type":"company","secondary_entity":"UK Competition and Markets Authority","action_type":"investigation","amount_usd":null,"date":"2023-01-01","jurisdiction":"UK"}
+{"id":"A0006","primary_entity":"SEC","primary_entity_type":"agency","secondary_entity":"Elon Musk","action_type":"lawsuit","amount_usd":null,"date":"2018-09-01","jurisdiction":"US"}
+{"id":"A0007","primary_entity":"Intel","primary_entity_type":"company","secondary_entity":"European Commission","action_type":"fine","amount_usd":1200000000,"date":"2009-05-01","jurisdiction":"EU"}
+{"id":"A0008","primary_entity":"Google","primary_entity_type":"company","secondary_entity":"Samsung","action_type":"partnership","amount_usd":null,"date":null,"jurisdiction":null}
+{"id":"A0009","primary_entity":"Google","primary_entity_type":"company","secondary_entity":"Japan's Fair Trade Commission","action_type":"investigation","amount_usd":null,"date":"2024-01-01","jurisdiction":"Other"}
+{"id":"A0010","primary_entity":"Sarah Chen","primary_entity_type":"individual","secondary_entity":"TikTok","action_type":"lawsuit","amount_usd":15000000,"date":"2024-03-05","jurisdiction":null}
