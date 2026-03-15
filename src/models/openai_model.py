@@ -2,6 +2,7 @@ import time
 from openai import OpenAI
 from src.models.base import Model, ModelResult
 from dotenv import load_dotenv
+from src.pricing import compute_cost
 
 
 load_dotenv()
@@ -34,5 +35,9 @@ class OpenAIModel(Model):
             latency_ms=latency_ms,
             input_tokens=usage.prompt_tokens if usage else None,
             output_tokens=usage.completion_tokens if usage else None,
-            cost_usd=None,
+            cost_usd=compute_cost(
+                self.name,
+                usage.prompt_tokens if usage else None,
+                usage.completion_tokens if usage else None,
+                ),
         )

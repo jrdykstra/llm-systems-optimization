@@ -160,6 +160,7 @@ def grade_rows(
             "input_tokens",
             "output_tokens",
             "cost_usd",
+            "escalated"
         ):
             if key in pred_row:
                 out_row[key] = pred_row[key]
