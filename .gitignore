@@ -1,7 +1,7 @@
 __pycache__/
 *.pyc
 .env
-runs/.gitkeep
+runs/
 .venv/
 notebooks/
 
