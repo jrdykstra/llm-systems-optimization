@@ -28,9 +28,15 @@ def build_prompt(task: dict) -> str:
     - primary_entity_type: one of exactly: company | agency | individual
     - secondary_entity: string or null
     - action_type: one of exactly: acquisition | fine | lawsuit | partnership | investigation
-    - amount_usd: number (integer) or null — convert "$1.2 billion" -> 1200000000, "$520 million" -> 520000000
+    - amount_usd: number (integer) or null — convert "$1.2 billion" -> 1200000000, "$520 million" -> 520000000.
+        If the amount is in a non-USD currency (e.g. €, £), use null.
     - date: string in YYYY-MM-DD format or null — "December 2022" -> "2022-12-01", "in 2023" -> "2023-01-01"
     - jurisdiction: one of exactly: US | EU | UK | Other | null
+        Only infer jurisdiction from this exact list of regulators:
+            FTC → US, SEC → US, European Commission → EU,
+            UK Financial Conduct Authority → UK, UK Competition and Markets Authority → UK,
+            Japan's Fair Trade Commission → Other.
+        If the regulator is not in this list and no explicit location is stated, use null.
 
     Role rules (which entity is primary vs secondary):
     - acquisition: primary = acquirer, secondary = target
@@ -76,7 +82,7 @@ def main():
             row = {
                 "id": task["id"],
                 "model": model.name,
-                "prompt_version": "v1",
+                "prompt_version": "v2",
                 "output_text": result.output_text,
                 "latency_ms": result.latency_ms,
                 "input_tokens": result.input_tokens,

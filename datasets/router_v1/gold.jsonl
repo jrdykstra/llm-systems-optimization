@@ -8,3 +8,23 @@
 {"id":"A0008","primary_entity":"Google","primary_entity_type":"company","secondary_entity":"Samsung","action_type":"partnership","amount_usd":null,"date":null,"jurisdiction":null}
 {"id":"A0009","primary_entity":"Google","primary_entity_type":"company","secondary_entity":"Japan's Fair Trade Commission","action_type":"investigation","amount_usd":null,"date":"2024-01-01","jurisdiction":"Other"}
 {"id":"A0010","primary_entity":"Sarah Chen","primary_entity_type":"individual","secondary_entity":"TikTok","action_type":"lawsuit","amount_usd":15000000,"date":"2024-03-05","jurisdiction":null}
+{"id":"A0011","primary_entity":"FTC","primary_entity_type":"agency","secondary_entity":"Amazon","action_type":"lawsuit","amount_usd":null,"date":"2023-03-01","jurisdiction":"US"}
+{"id":"A0012","primary_entity":"Meta","primary_entity_type":"company","secondary_entity":"European Commission","action_type":"fine","amount_usd":200000000,"date":"2023-07-04","jurisdiction":"EU"}
+{"id":"A0013","primary_entity":"Elon Musk","primary_entity_type":"individual","secondary_entity":"SEC","action_type":"investigation","amount_usd":null,"date":"2020-01-01","jurisdiction":"US"}
+{"id":"A0014","primary_entity":"Qualcomm","primary_entity_type":"company","secondary_entity":"South Korea's Fair Trade Commission","action_type":"fine","amount_usd":975000000,"date":"2016-12-28","jurisdiction":null}
+{"id":"A0015","primary_entity":"Apple","primary_entity_type":"company","secondary_entity":"European Commission","action_type":"fine","amount_usd":2000000000,"date":"2024-03-01","jurisdiction":"EU"}
+{"id":"A0016","primary_entity":"Cisco","primary_entity_type":"company","secondary_entity":"Splunk","action_type":"acquisition","amount_usd":28000000000,"date":"2024-03-18","jurisdiction":null}
+{"id":"A0017","primary_entity":"United States Department of Justice","primary_entity_type":"agency","secondary_entity":"Visa","action_type":"lawsuit","amount_usd":null,"date":"2024-09-24","jurisdiction":null}
+{"id":"A0018","primary_entity":"Microsoft","primary_entity_type":"company","secondary_entity":"Brazil's Administrative Council for Economic Defense","action_type":"investigation","amount_usd":null,"date":"2024-01-01","jurisdiction":null}
+{"id":"A0019","primary_entity":"Acme Corp","primary_entity_type":"company","secondary_entity":"Globex","action_type":"partnership","amount_usd":null,"date":null,"jurisdiction":null}
+{"id":"A0020","primary_entity":"Tesla","primary_entity_type":"company","secondary_entity":"Grohmann Engineering","action_type":"acquisition","amount_usd":null,"date":null,"jurisdiction":null}
+{"id":"A0021","primary_entity":"Google","primary_entity_type":"company","secondary_entity":"European Commission","action_type":"fine","amount_usd":null,"date":"2017-06-01","jurisdiction":"EU"}
+{"id":"A0022","primary_entity":"HSBC","primary_entity_type":"company","secondary_entity":"UK Financial Conduct Authority","action_type":"fine","amount_usd":null,"date":"2021-12-17","jurisdiction":"UK"}
+{"id":"A0023","primary_entity":"Broadcom","primary_entity_type":"company","secondary_entity":"VMware","action_type":"acquisition","amount_usd":69000000000,"date":"2023-11-22","jurisdiction":null}
+{"id":"A0024","primary_entity":"FTC","primary_entity_type":"agency","secondary_entity":"Amazon","action_type":"lawsuit","amount_usd":null,"date":"2023-06-21","jurisdiction":"US"}
+{"id":"A0025","primary_entity":"SpaceX","primary_entity_type":"company","secondary_entity":"NASA","action_type":"partnership","amount_usd":2900000000,"date":"2021-04-16","jurisdiction":null}
+{"id":"A0026","primary_entity":"Google","primary_entity_type":"company","secondary_entity":"India's Competition Commission","action_type":"fine","amount_usd":162000000,"date":"2022-10-20","jurisdiction":null}
+{"id":"A0027","primary_entity":"Qantas Airways","primary_entity_type":"company","secondary_entity":"Australia's Competition and Consumer Commission","action_type":"investigation","amount_usd":null,"date":"2023-08-01","jurisdiction":null}
+{"id":"A0028","primary_entity":"Carl Icahn","primary_entity_type":"individual","secondary_entity":"Illumina","action_type":"lawsuit","amount_usd":null,"date":"2023-06-30","jurisdiction":"US"}
+{"id":"A0029","primary_entity":"Jane Park","primary_entity_type":"individual","secondary_entity":"Theranos","action_type":"lawsuit","amount_usd":null,"date":"2016-05-10","jurisdiction":"US"}
+{"id":"A0030","primary_entity":"Microsoft","primary_entity_type":"company","secondary_entity":"Activision Blizzard","action_type":"acquisition","amount_usd":68700000000,"date":"2023-10-13","jurisdiction":"EU"}

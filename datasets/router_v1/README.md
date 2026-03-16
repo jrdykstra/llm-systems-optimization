@@ -75,6 +75,9 @@ Resolution order:
 
 Use the surface form as it appears in the input text. Do not expand abbreviations
 (e.g. keep "FTC", not "Federal Trade Commission" unless the input uses the full name).
+Strip titles, honorifics, and role descriptors
+(e.g. "Attorney Sarah Chen" → "Sarah Chen", "CEO John Doe" → "John Doe").
+
 
 ## Grading Rules (Week 1)
 

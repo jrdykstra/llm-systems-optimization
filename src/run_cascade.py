@@ -24,34 +24,39 @@ def load_tasks(path):
     return tasks
 
 
-def build_prompt(task):
+def build_prompt(task: dict) -> str:
     input_text = task["input"].strip()
 
     return f"""Extract structured data from the input text and return a single JSON object. No markdown, no explanation — raw JSON only.
 
-Field rules:
-- primary_entity: string — the main subject (see role rules below)
-- primary_entity_type: one of exactly: company | agency | individual
-- secondary_entity: string or null
-- action_type: one of exactly: acquisition | fine | lawsuit | partnership | investigation
-- amount_usd: number (integer) or null — convert "$1.2 billion" -> 1200000000, "$520 million" -> 520000000
-- date: string in YYYY-MM-DD format or null — "December 2022" -> "2022-12-01", "in 2023" -> "2023-01-01"
-- jurisdiction: one of exactly: US | EU | UK | Other | null
+    Field rules:
+    - primary_entity: string — the main subject (see role rules below)
+    - primary_entity_type: one of exactly: company | agency | individual
+    - secondary_entity: string or null
+    - action_type: one of exactly: acquisition | fine | lawsuit | partnership | investigation
+    - amount_usd: number (integer) or null — convert "$1.2 billion" -> 1200000000, "$520 million" -> 520000000.
+        If the amount is in a non-USD currency (e.g. €, £), use null.
+    - date: string in YYYY-MM-DD format or null — "December 2022" -> "2022-12-01", "in 2023" -> "2023-01-01"
+    - jurisdiction: one of exactly: US | EU | UK | Other | null
+        Only infer jurisdiction from this exact list of regulators:
+            FTC → US, SEC → US, European Commission → EU,
+            UK Financial Conduct Authority → UK, UK Competition and Markets Authority → UK,
+            Japan's Fair Trade Commission → Other.
+        If the regulator is not in this list and no explicit location is stated, use null.
 
-Role rules (which entity is primary vs secondary):
-- acquisition: primary = acquirer, secondary = target
-- fine: primary = entity fined, secondary = entity imposing fine
-- lawsuit: primary = plaintiff/filer, secondary = defendant
-- partnership: primary = first-named entity, secondary = second-named entity
-- investigation: primary = entity under investigation, secondary = investigating body
+    Role rules (which entity is primary vs secondary):
+    - acquisition: primary = acquirer, secondary = target
+    - fine: primary = entity fined, secondary = entity imposing fine
+    - lawsuit: primary = plaintiff/filer, secondary = defendant
+    - partnership: primary = first-named entity, secondary = second-named entity
+    - investigation: primary = entity under investigation, secondary = investigating body
 
-Input: {input_text}"""
+    Input: {input_text}"""
 
 
 def should_escalate(output_text):
-    """Return True if the cheap model output fails parse or schema validation."""
-    pred_obj, parse_errors = parse_pred_object(output_text, 
-                                               allow_embedded_json=True)
+    """Return True if the cheap model output fails parse, schema, or semantic heuristics."""
+    pred_obj, parse_errors = parse_pred_object(output_text, allow_embedded_json=True)
     if pred_obj is None:
         return True, parse_errors
 
@@ -59,7 +64,20 @@ def should_escalate(output_text):
     if schema_errors:
         return True, schema_errors
 
+    # Semantic heuristic: in lawsuits, mini consistently puts the defendant as primary instead of the plaintiff.
+    # If action is lawsuit and primary is a company, the model likely swapped roles, 
+    # agencies/individuals are the usual filers.
+    if (pred_obj.get("action_type") == "lawsuit"
+            and pred_obj.get("primary_entity_type") == "company"):
+        return True, ["heuristic:lawsuit_role_swap"]
+
+    # Semantic heuristic: jurisdiction "Other" is rarely correct
+    # models guess "Other" for unlisted regulators instead of null.
+    if pred_obj.get("jurisdiction") == "Other":
+        return True, ["heuristic:jurisdiction_other"]
+
     return False, []
+
 
 
 def main():
@@ -112,7 +130,7 @@ def main():
                     "routed_from": None,
                     "escalated": False,
                     "escalation_reasons": [],
-                    "prompt_version": "v1",
+                    "prompt_version": "v2",
                     "output_text": cheap_result.output_text,
                     "latency_ms": cheap_result.latency_ms,
                     "input_tokens": cheap_result.input_tokens,
