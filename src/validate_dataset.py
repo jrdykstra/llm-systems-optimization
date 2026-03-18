@@ -4,22 +4,10 @@ import json
 import sys
 from pathlib import Path
 
-TASKS_KEYS = {"id", "task_type", "difficulty", "input", "instruction"}
-GOLD_KEYS = {
-    "id",
-    "primary_entity",
-    "primary_entity_type",
-    "secondary_entity",
-    "action_type",
-    "amount_usd",
-    "date",
-    "jurisdiction",
-}
-
-VALID_ENTITY_TYPES = {"company", "agency", "individual"}
-VALID_ACTION_TYPES = {"acquisition", "fine", "lawsuit", "partnership", "investigation"}
-VALID_JURISDICTIONS = {"US", "EU", "UK", "Other"}
-
+from src.schema.extraction import (
+    TASKS_KEYS, GOLD_KEYS, VALID_ENTITY_TYPES,
+    VALID_ACTION_TYPES, VALID_JURISDICTIONS,
+)
 
 def load_jsonl(path):
     """Parse a JSONL file. Returns list of (line_number, obj) tuples."""

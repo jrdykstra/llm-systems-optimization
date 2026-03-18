@@ -3,18 +3,7 @@
 import json
 import argparse
 from pathlib import Path
-
-
-def load_grades(path):
-    """Load a grades JSONL file. Returns list of dicts."""
-    rows = []
-    with open(path, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            rows.append(json.loads(line))
-    return rows
+from src.utils import load_jsonl
 
 
 def summarize_one(rows):
@@ -97,7 +86,7 @@ def main():
 
     summaries = []
     for path_str in args.grade_files:
-        rows = load_grades(Path(path_str))
+        rows = load_jsonl(path_str)
         summary = summarize_one(rows)
         if summary:
             summaries.append(summary)

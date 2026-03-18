@@ -4,18 +4,7 @@ import json
 import argparse
 from pathlib import Path
 from collections import defaultdict
-
-
-def load_jsonl(path):
-    rows = []
-    with open(path, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            rows.append(json.loads(line))
-    return rows
-
+from src.utils import load_jsonl
 
 def per_field_breakdown(grades, label):
     """Print per-field accuracy for one run."""
@@ -78,7 +67,7 @@ def main():
 
     for path_str in args.grade_files:
         path = Path(path_str)
-        grades = load_jsonl(path)
+        grades = load_jsonl(path_str)
         label = path.stem
         per_field_breakdown(grades, label)
         difficulty_breakdown(grades, tasks, label)

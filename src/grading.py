@@ -29,36 +29,12 @@ from __future__ import annotations
 import json
 from typing import Any, Dict, List, Optional, Tuple
 
+from src.schema.extraction import (
+    SCHEMA_KEYS, VALID_ENTITY_TYPES, VALID_ACTION_TYPES,
+    VALID_JURISDICTIONS, FIELD_WEIGHTS, BASE_SCORE, EPS,
+)
+
 JsonDict = Dict[str, Any]
-
-# ---------- Schema constants ----------
-SCHEMA_KEYS = {
-    "primary_entity",
-    "primary_entity_type",
-    "secondary_entity",
-    "action_type",
-    "amount_usd",
-    "date",
-    "jurisdiction",
-}
-
-VALID_ENTITY_TYPES = {"company", "agency", "individual"}
-VALID_ACTION_TYPES = {"acquisition", "fine", "lawsuit", "partnership", "investigation"}
-VALID_JURISDICTIONS = {"US", "EU", "UK", "Other"}
-
-FIELD_WEIGHTS: Dict[str, float] = {
-    "primary_entity": 0.15,
-    "primary_entity_type": 0.05,
-    "secondary_entity": 0.10,
-    "action_type": 0.10,
-    "amount_usd": 0.10,
-    "date": 0.10,
-    "jurisdiction": 0.10,
-}
-
-BASE_SCORE = 0.30
-EPS = 1e-6
-
 
 # ---------- Parsing: raw model text -> dict ----------
 def extract_first_json_object(text: str) -> Tuple[Optional[str], List[str]]:

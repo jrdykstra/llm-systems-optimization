@@ -4,20 +4,7 @@ import json
 import random
 import argparse
 from pathlib import Path
-
-
-def load_scores(path):
-    """Load total_score from a grades JSONL file. Returns dict of id -> score."""
-    scores = {}
-    with open(path, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            r = json.loads(line)
-            scores[r["id"]] = r["total_score"]
-    return scores
-
+from src.utils import load_jsonl
 
 def bootstrap_mean_ci(scores, n_boot=100000, ci=95, seed=291281):
     """Compute bootstrap CI for mean score."""
@@ -70,7 +57,8 @@ def main():
     runs = []
     for path_str in args.grade_files:
         path = Path(path_str)
-        scores = load_scores(path)
+        rows = load_jsonl(path_str)
+        scores = {r["id"]: r["total_score"] for r in rows}
         label = path.stem.replace("_grades", "").replace("cascade_gpt-4o-mini_gpt-4o", "cascade")
         runs.append((label, scores))
 

@@ -3,20 +3,7 @@
 import json
 import argparse
 from pathlib import Path
-
-
-def load_grades(path):
-    """Load grades JSONL. Returns dict of id -> row."""
-    rows = {}
-    with open(path, encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-            r = json.loads(line)
-            rows[r["id"]] = r
-    return rows
-
+from src.utils import load_jsonl
 
 def detect(before, after, threshold=0.0):
     """
@@ -74,8 +61,8 @@ def main():
     )
     args = parser.parse_args()
 
-    before = load_grades(Path(args.before))
-    after = load_grades(Path(args.after))
+    before = load_jsonl(args.before, keyed_by_id=True)
+    after = load_jsonl(args.after, keyed_by_id=True)
 
     label_before = Path(args.before).stem.replace("_grades", "")
     label_after = Path(args.after).stem.replace("_grades", "")

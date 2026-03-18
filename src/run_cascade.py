@@ -8,10 +8,13 @@ from pathlib import Path
 from src.models.openai_model import OpenAIModel
 from src.grading import parse_pred_object, validate_schema
 
+PROMPT_VERSION = "v2"
+PROMPT_PATH = Path(f"prompts/extraction_{PROMPT_VERSION}.txt")
 
 DATASET_PATH = Path("datasets/router_v1/tasks.jsonl")
 RUNS_DIR = Path("runs")
 
+from src.schema.extraction import KNOWN_REGULATORS
 
 def load_tasks(path):
     tasks = []
@@ -24,35 +27,9 @@ def load_tasks(path):
     return tasks
 
 
-def build_prompt(task: dict) -> str:
-    input_text = task["input"].strip()
-
-    return f"""Extract structured data from the input text and return a single JSON object. No markdown, no explanation — raw JSON only.
-
-    Field rules:
-    - primary_entity: string — the main subject (see role rules below)
-    - primary_entity_type: one of exactly: company | agency | individual
-    - secondary_entity: string or null
-    - action_type: one of exactly: acquisition | fine | lawsuit | partnership | investigation
-    - amount_usd: number (integer) or null — convert "$1.2 billion" -> 1200000000, "$520 million" -> 520000000.
-        If the amount is in a non-USD currency (e.g. €, £), use null.
-    - date: string in YYYY-MM-DD format or null — "December 2022" -> "2022-12-01", "in 2023" -> "2023-01-01"
-    - jurisdiction: one of exactly: US | EU | UK | Other | null
-        Only infer jurisdiction from this exact list of regulators:
-            FTC → US, SEC → US, European Commission → EU,
-            UK Financial Conduct Authority → UK, UK Competition and Markets Authority → UK,
-            Japan's Fair Trade Commission → Other.
-        If the regulator is not in this list and no explicit location is stated, use null.
-
-    Role rules (which entity is primary vs secondary):
-    - acquisition: primary = acquirer, secondary = target
-    - fine: primary = entity fined, secondary = entity imposing fine
-    - lawsuit: primary = plaintiff/filer, secondary = defendant
-    - partnership: primary = first-named entity, secondary = second-named entity
-    - investigation: primary = entity under investigation, secondary = investigating body
-
-    Input: {input_text}"""
-
+def build_prompt(task) -> str:
+    template = PROMPT_PATH.read_text(encoding="utf-8")
+    return template.replace("{input}", task["input"].strip())
 
 def should_escalate(output_text):
     """Return True if the cheap model output fails parse, schema, or semantic heuristics."""
@@ -74,8 +51,10 @@ def should_escalate(output_text):
     # Semantic heuristic: jurisdiction "Other" is rarely correct
     # models guess "Other" for unlisted regulators instead of null.
     if pred_obj.get("jurisdiction") == "Other":
-        return True, ["heuristic:jurisdiction_other"]
-
+        secondary = pred_obj.get("secondary_entity", "")
+        if secondary not in KNOWN_REGULATORS:
+            return True, ["heuristic:jurisdiction_other_unknown_regulator"]
+        
     return False, []
 
 
@@ -115,7 +94,7 @@ def main():
                     "routed_from": args.cheap,
                     "escalated": True,
                     "escalation_reasons": reasons,
-                    "prompt_version": "v1",
+                    "prompt_version": "v2",
                     "output_text": exp_result.output_text,
                     "latency_ms": cheap_result.latency_ms + exp_result.latency_ms,
                     "input_tokens": (cheap_result.input_tokens or 0) + (exp_result.input_tokens or 0),
@@ -130,7 +109,7 @@ def main():
                     "routed_from": None,
                     "escalated": False,
                     "escalation_reasons": [],
-                    "prompt_version": "v2",
+                    "prompt_version": PROMPT_VERSION,
                     "output_text": cheap_result.output_text,
                     "latency_ms": cheap_result.latency_ms,
                     "input_tokens": cheap_result.input_tokens,
