@@ -4,6 +4,7 @@ from pathlib import Path
 
 from src.models.openai_model import OpenAIModel
 from src.models.local_model import LocalModel
+from src.models.hf_model import HFModel
 
 
 DATASET_PATH = Path("datasets/router_v1/tasks.jsonl")
@@ -33,6 +34,9 @@ def select_model(provider: str, model_name: str):
 
     if provider == "local":
         return LocalModel(model_name)
+    
+    if provider == "huggingface":
+        return HFModel(model_name)
 
     raise ValueError(f"Unsupported provider: {provider}")
 
@@ -49,7 +53,7 @@ def main():
 
     model = select_model(args.provider, args.model)
 
-    output_path = RUNS_DIR / f"{model.name}_predictions.jsonl"
+    output_path = RUNS_DIR / f"{model.name.replace('/', '_')}_predictions.jsonl"
 
     with open(output_path, "w", encoding="utf-8") as out:
 

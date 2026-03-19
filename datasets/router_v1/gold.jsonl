@@ -28,3 +28,23 @@
 {"id":"A0028","primary_entity":"Carl Icahn","primary_entity_type":"individual","secondary_entity":"Illumina","action_type":"lawsuit","amount_usd":null,"date":"2023-06-30","jurisdiction":"US"}
 {"id":"A0029","primary_entity":"Jane Park","primary_entity_type":"individual","secondary_entity":"Theranos","action_type":"lawsuit","amount_usd":null,"date":"2016-05-10","jurisdiction":"US"}
 {"id":"A0030","primary_entity":"Microsoft","primary_entity_type":"company","secondary_entity":"Activision Blizzard","action_type":"acquisition","amount_usd":68700000000,"date":"2023-10-13","jurisdiction":"EU"}
+{"id":"A0031","primary_entity":"Pfizer","primary_entity_type":"company","secondary_entity":"AstraZeneca","action_type":"acquisition","amount_usd":120000000000,"date":"2014-05-01","jurisdiction":null}
+{"id":"A0032","primary_entity":"Oracle","primary_entity_type":"company","secondary_entity":"Google","action_type":"lawsuit","amount_usd":0,"date":"2016-05-26","jurisdiction":null}
+{"id":"A0033","primary_entity":"Illumina","primary_entity_type":"company","secondary_entity":"FTC","action_type":"investigation","amount_usd":null,"date":"2021-01-01","jurisdiction":"US"}
+{"id":"A0034","primary_entity":"Samsung Electronics","primary_entity_type":"company","secondary_entity":"European Commission","action_type":"fine","amount_usd":null,"date":"2014-10-09","jurisdiction":"EU"}
+{"id":"A0035","primary_entity":"Amazon","primary_entity_type":"company","secondary_entity":"Whole Foods","action_type":"acquisition","amount_usd":13700000000,"date":"2017-08-28","jurisdiction":"US"}
+{"id":"A0036","primary_entity":"FTC","primary_entity_type":"agency","secondary_entity":"Martin Shkreli","action_type":"lawsuit","amount_usd":null,"date":"2020-01-27","jurisdiction":"US"}
+{"id":"A0037","primary_entity":"Robinhood","primary_entity_type":"company","secondary_entity":"SEC","action_type":"fine","amount_usd":65000000,"date":"2020-12-17","jurisdiction":"US"}
+{"id":"A0038","primary_entity":"Google","primary_entity_type":"company","secondary_entity":"Turkey's Competition Board","action_type":"fine","amount_usd":25600000,"date":"2020-01-01","jurisdiction":null}
+{"id":"A0039","primary_entity":"Ken Paxton","primary_entity_type":"individual","secondary_entity":"Google","action_type":"lawsuit","amount_usd":null,"date":"2020-12-16","jurisdiction":null}
+{"id":"A0040","primary_entity":"Facebook","primary_entity_type":"company","secondary_entity":"FTC","action_type":"fine","amount_usd":5000000000,"date":"2019-07-24","jurisdiction":"US"}
+{"id":"A0041","primary_entity":"Berkshire Hathaway","primary_entity_type":"company","secondary_entity":"Alleghany Corporation","action_type":"acquisition","amount_usd":11600000000,"date":"2022-10-19","jurisdiction":null}
+{"id":"A0042","primary_entity":"Visa","primary_entity_type":"company","secondary_entity":"Plaid","action_type":"acquisition","amount_usd":5300000000,"date":"2021-01-12","jurisdiction":"US"}
+{"id":"A0043","primary_entity":"Walmart","primary_entity_type":"company","secondary_entity":"Mexico's Federal Economic Competition Commission","action_type":"investigation","amount_usd":null,"date":"2024-03-01","jurisdiction":null}
+{"id":"A0044","primary_entity":"Amazon","primary_entity_type":"company","secondary_entity":"UK Competition and Markets Authority","action_type":"fine","amount_usd":null,"date":"2022-01-01","jurisdiction":"UK"}
+{"id":"A0045","primary_entity":"Disney","primary_entity_type":"company","secondary_entity":"21st Century Fox","action_type":"acquisition","amount_usd":71300000000,"date":"2019-03-20","jurisdiction":null}
+{"id":"A0046","primary_entity":"Erin Wynn","primary_entity_type":"individual","secondary_entity":"Equifax","action_type":"lawsuit","amount_usd":70000000000,"date":"2017-09-12","jurisdiction":null}
+{"id":"A0047","primary_entity":"Salesforce","primary_entity_type":"company","secondary_entity":"Slack","action_type":"acquisition","amount_usd":27700000000,"date":"2021-07-21","jurisdiction":null}
+{"id":"A0048","primary_entity":"Bayer","primary_entity_type":"company","secondary_entity":"South Africa's Competition Commission","action_type":"investigation","amount_usd":null,"date":"2018-01-01","jurisdiction":null}
+{"id":"A0049","primary_entity":"Citibank","primary_entity_type":"company","secondary_entity":"UK Financial Conduct Authority","action_type":"fine","amount_usd":500000000,"date":"2018-11-13","jurisdiction":"UK"}
+{"id":"A0050","primary_entity":"Intel","primary_entity_type":"company","secondary_entity":"Tower Semiconductor","action_type":"acquisition","amount_usd":5400000000,"date":"2023-08-16","jurisdiction":null}
