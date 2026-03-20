@@ -49,7 +49,7 @@ def test_check_ids_match_passes():
 
 def test_full_dataset_validates():
     """Integration test: actual dataset files pass validation."""
-    base = Path(__file__).resolve().parent.parent / "datasets" / "router_v1"
+    base = Path(__file__).resolve().parent.parent / "datasets" / "extraction_v1"
     tasks = load_jsonl(base / "tasks.jsonl")
     gold = load_jsonl(base / "gold.jsonl")
     assert len(tasks) == len(gold)

@@ -11,7 +11,7 @@ from src.grading import parse_pred_object, validate_schema
 PROMPT_VERSION = "v2"
 PROMPT_PATH = Path(f"prompts/extraction_{PROMPT_VERSION}.txt")
 
-DATASET_PATH = Path("datasets/router_v1/tasks.jsonl")
+DATASET_PATH = Path("datasets/extraction_v1/tasks.jsonl")
 RUNS_DIR = Path("runs")
 
 from src.schema.extraction import KNOWN_REGULATORS

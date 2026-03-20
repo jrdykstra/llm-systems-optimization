@@ -58,7 +58,7 @@ def main():
     parser.add_argument("grade_files", nargs="+", help="One or more *_grades.jsonl files.")
     parser.add_argument(
         "--tasks",
-        default="datasets/router_v1/tasks.jsonl",
+        default="datasets/extraction_v1/tasks.jsonl",
         help="Path to tasks.jsonl for difficulty labels.",
     )
     args = parser.parse_args()

@@ -1,0 +1,17 @@
+Extract structured antitrust case data from the input text and return a single JSON object. No markdown, no explanation — raw JSON only.
+
+Field rules:
+- case_name: string — official or descriptive case name (e.g. "United States v. Google")
+- plaintiff: string — the party bringing the action (e.g. "DOJ Antitrust Division", "FTC")
+- defendant: string — the party being sued or investigated
+- court: string or null — full court name if mentioned
+- date_filed: string in YYYY-MM-DD format or null — the date of the action described. "December 2025" -> "2025-12-01", "in 2025" -> "2025-01-01"
+- cause_of_action: one of exactly: bid_rigging | price_fixing | monopolization | merger_challenge | wage_fixing | algorithmic_pricing
+- statute: string or null — the statute cited (e.g. "Sherman Act", "Clayton Act")
+- market_definition: string or null — the relevant market as described
+- remedy_sought: one of exactly: criminal_penalty | injunctive_relief | divestiture | consent_decree | damages | null
+- holding: one of exactly: guilty_plea | convicted | settled | dismissed | pending | approved | null
+
+Strip titles and honorifics from entity names (e.g. "Former CEO John Smith" -> "John Smith").
+
+Input: {input}
