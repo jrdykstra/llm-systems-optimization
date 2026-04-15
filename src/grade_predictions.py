@@ -26,11 +26,9 @@ import json
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
-
-from src.grading import grade_extraction
+from src.grading import grade_extraction, grade_antitrust
 
 JsonDict = Dict[str, Any]
-
 
 def fail(msg: str) -> None:
     print(f"FAIL: {msg}", file=sys.stderr)
@@ -126,6 +124,7 @@ def validate_prediction_rows(pred_rows: List[Tuple[int, JsonDict]], gold_by_id: 
 def grade_rows(
     pred_rows: List[Tuple[int, JsonDict]],
     gold_by_id: Dict[str, JsonDict],
+    grader=grade_extraction,
 ) -> List[JsonDict]:
     """
     Grade all prediction rows and return graded result rows.
@@ -138,7 +137,7 @@ def grade_rows(
         output_text = pred_row["output_text"]
         gold_obj = gold_by_id[row_id]
 
-        grade = grade_extraction(output_text, gold_obj)
+        grade = grader(output_text, gold_obj)
 
         out_row: JsonDict = {
             "id": row_id,
@@ -198,16 +197,22 @@ def summarize(rows: List[JsonDict]) -> None:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Grade predictions JSONL against router_v1 gold labels.")
+    parser = argparse.ArgumentParser(description="Grade predictions JSONL against gold labels.")
     parser.add_argument(
         "--predictions",
         required=True,
         help="Path to predictions JSONL file.",
     )
     parser.add_argument(
+        "--task-type",
+        default="extraction_v1",
+        choices=["extraction_v1", "antitrust_v1"],
+        help="Task type to grade against. Default: extraction_v1",
+    )
+    parser.add_argument(
         "--gold",
-        default="datasets/router_v1/gold.jsonl",
-        help="Path to gold JSONL file. Default: datasets/router_v1/gold.jsonl",
+        default=None,
+        help="Path to gold JSONL file. Default: datasets/{task_type}/gold.jsonl",
     )
     parser.add_argument(
         "--output",
@@ -221,7 +226,12 @@ def main() -> None:
     args = parse_args()
 
     predictions_path = Path(args.predictions)
-    gold_path = Path(args.gold)
+
+    if args.gold is not None:
+        gold_path = Path(args.gold)
+    else:
+        gold_path = Path(f"datasets/{args.task_type}/gold.jsonl")
+
     output_path = Path(args.output)
 
     gold_rows = load_jsonl(gold_path)
@@ -230,10 +240,10 @@ def main() -> None:
     pred_rows = load_jsonl(predictions_path)
     validate_prediction_rows(pred_rows, gold_by_id)
 
-    graded_rows = grade_rows(pred_rows, gold_by_id)
+    grader = grade_antitrust if args.task_type == "antitrust_v1" else grade_extraction
+    graded_rows = grade_rows(pred_rows, gold_by_id, grader)
     write_jsonl(output_path, graded_rows)
     summarize(graded_rows)
-
 
 if __name__ == "__main__":
     main()

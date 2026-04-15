@@ -6,15 +6,12 @@ import argparse
 from pathlib import Path
 
 from src.models.openai_model import OpenAIModel
-from src.grading import parse_pred_object, validate_schema
-
-PROMPT_VERSION = "v2"
-PROMPT_PATH = Path(f"prompts/extraction_{PROMPT_VERSION}.txt")
-
-DATASET_PATH = Path("datasets/extraction_v1/tasks.jsonl")
-RUNS_DIR = Path("runs")
+from src.grading import parse_pred_object, validate_schema, validate_antitrust_schema
 
 from src.schema.extraction import KNOWN_REGULATORS
+
+RUNS_DIR = Path("runs")
+
 
 def load_tasks(path):
     tasks = []
@@ -27,8 +24,8 @@ def load_tasks(path):
     return tasks
 
 
-def build_prompt(task) -> str:
-    template = PROMPT_PATH.read_text(encoding="utf-8")
+def build_prompt(task, prompt_path) -> str:
+    template = prompt_path.read_text(encoding="utf-8")
     return template.replace("{input}", task["input"].strip())
 
 def should_escalate(output_text):
@@ -57,30 +54,60 @@ def should_escalate(output_text):
         
     return False, []
 
+def should_escalate_antitrust(output_text):
+    """Return True if the cheap model output fails parse, schema, or antitrust heuristics."""
+    pred_obj, parse_errors = parse_pred_object(output_text, allow_embedded_json=True)
+    if pred_obj is None:
+        return True, parse_errors
+
+    schema_errors = validate_antitrust_schema(pred_obj)
+    if schema_errors:
+        return True, schema_errors
+
+    # Heuristic: plaintiff/defendant swap — if plaintiff looks like a person/company
+    # and defendant looks like a government entity, they're probably swapped
+    plaintiff = (pred_obj.get("plaintiff") or "").lower()
+    gov_keywords = ["doj", "department of justice", "united states", "ftc", "federal trade"]
+    if not any(kw in plaintiff for kw in gov_keywords):
+        return True, ["heuristic:plaintiff_not_government"]
+
+    # Heuristic: remedy/holding field confusion — model puts holding values in remedy
+    holding_values = {"guilty_plea", "convicted", "settled", "dismissed", "pending", "approved"}
+    remedy = pred_obj.get("remedy_sought")
+    if remedy in holding_values:
+        return True, ["heuristic:remedy_holding_swap"]
+
+    return False, []
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--cheap", default="gpt-4o-mini", help="Cheap model name")
     parser.add_argument("--expensive", default="gpt-4o", help="Expensive model name")
+    parser.add_argument("--task-type", default="extraction_v1",
+                        choices=["extraction_v1", "antitrust_v1"])
     args = parser.parse_args()
 
-    tasks = load_tasks(DATASET_PATH)
+    dataset_path = Path(f"datasets/{args.task_type}/tasks.jsonl")
+    prompt_path = Path(f"prompts/{args.task_type.split('_')[0]}.txt")
+
+    tasks = load_tasks(dataset_path)
 
     cheap_model = OpenAIModel(args.cheap)
     expensive_model = OpenAIModel(args.expensive)
+    escalate_fn = should_escalate_antitrust if args.task_type == "antitrust_v1" else should_escalate
 
-    output_path = RUNS_DIR / f"cascade_{args.cheap}_{args.expensive}_predictions.jsonl"
+    output_path = RUNS_DIR / f"cascade_{args.cheap}_{args.expensive}_{args.task_type}_predictions.jsonl"
 
     escalated_count = 0
 
     with open(output_path, "w", encoding="utf-8") as out:
         for i, task in enumerate(tasks, start=1):
-            prompt = build_prompt(task)
+            prompt = build_prompt(task, prompt_path)
 
             # Step 1: try cheap model
             cheap_result = cheap_model.generate(prompt)
-            escalate, reasons = should_escalate(cheap_result.output_text)
+            escalate, reasons = escalate_fn(cheap_result.output_text)
 
             if escalate:
                 # Step 2: escalate to expensive model
@@ -94,7 +121,7 @@ def main():
                     "routed_from": args.cheap,
                     "escalated": True,
                     "escalation_reasons": reasons,
-                    "prompt_version": "v2",
+                    "prompt_version": args.task_type,
                     "output_text": exp_result.output_text,
                     "latency_ms": cheap_result.latency_ms + exp_result.latency_ms,
                     "input_tokens": (cheap_result.input_tokens or 0) + (exp_result.input_tokens or 0),
@@ -109,7 +136,7 @@ def main():
                     "routed_from": None,
                     "escalated": False,
                     "escalation_reasons": [],
-                    "prompt_version": PROMPT_VERSION,
+                    "prompt_version": args.task_type,
                     "output_text": cheap_result.output_text,
                     "latency_ms": cheap_result.latency_ms,
                     "input_tokens": cheap_result.input_tokens,

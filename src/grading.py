@@ -319,3 +319,164 @@ def grade_extraction(pred_text: str, gold_obj: JsonDict) -> JsonDict:
     result["total_score"] = compute_total_score(field_correct)
     result["errors"] = errors
     return result
+
+##########################################################3
+##########################################################3
+##########################################################3
+##########################################################3
+##########################################################3
+##########################################################3
+
+    # ---------- Antitrust v1 grading ----------
+from src.schema.antitrust import (
+    SCHEMA_KEYS as ANTITRUST_SCHEMA_KEYS,
+    VALID_CAUSES, VALID_REMEDIES, VALID_HOLDINGS,
+    FIELD_WEIGHTS as ANTITRUST_FIELD_WEIGHTS,
+    BASE_SCORE as ANTITRUST_BASE_SCORE,
+)
+
+
+def validate_antitrust_keys(pred_obj: JsonDict) -> List[str]:
+    actual = set(pred_obj.keys())
+    missing = ANTITRUST_SCHEMA_KEYS - actual
+    extra = actual - ANTITRUST_SCHEMA_KEYS
+    errors: List[str] = []
+    if missing:
+        errors.append("missing_keys:" + ",".join(sorted(missing)))
+    if extra:
+        errors.append("extra_keys:" + ",".join(sorted(extra)))
+    return errors
+
+
+def validate_antitrust_types(pred_obj: JsonDict) -> List[str]:
+    errors: List[str] = []
+
+    # Required strings
+    for field in ("case_name", "plaintiff", "defendant"):
+        if not isinstance(pred_obj[field], str):
+            errors.append(f"type_error:{field}")
+
+    # Nullable strings
+    for field in ("court", "date_filed", "statute", "market_definition"):
+        val = pred_obj[field]
+        if val is not None and not isinstance(val, str):
+            errors.append(f"type_error:{field}")
+
+    # Required enum string
+    if not isinstance(pred_obj["cause_of_action"], str):
+        errors.append("type_error:cause_of_action")
+
+    # Nullable enum strings
+    for field in ("remedy_sought", "holding"):
+        val = pred_obj[field]
+        if val is not None and not isinstance(val, str):
+            errors.append(f"type_error:{field}")
+
+    return errors
+
+
+def validate_antitrust_enums(pred_obj: JsonDict) -> List[str]:
+    errors: List[str] = []
+
+    if pred_obj["cause_of_action"] not in VALID_CAUSES:
+        errors.append("enum_error:cause_of_action")
+
+    rs = pred_obj["remedy_sought"]
+    if rs is not None and rs not in VALID_REMEDIES:
+        errors.append("enum_error:remedy_sought")
+
+    ho = pred_obj["holding"]
+    if ho is not None and ho not in VALID_HOLDINGS:
+        errors.append("enum_error:holding")
+
+    return errors
+
+
+def validate_antitrust_schema(pred_obj: JsonDict) -> List[str]:
+    key_errs = validate_antitrust_keys(pred_obj)
+    if key_errs:
+        return key_errs
+
+    type_errs = validate_antitrust_types(pred_obj)
+    if type_errs:
+        return type_errs
+
+    enum_errs = validate_antitrust_enums(pred_obj)
+    if enum_errs:
+        return enum_errs
+
+    return []
+
+def match_fuzzy_string(a: Any, b: Any, threshold: float = 0.6) -> bool:
+    """Token-overlap (Jaccard) match for free-text fields."""
+    if a is None or b is None:
+        return a is None and b is None
+    if not isinstance(a, str) or not isinstance(b, str):
+        return False
+    tokens_a = set(a.strip().lower().split())
+    tokens_b = set(b.strip().lower().split())
+    if not tokens_a and not tokens_b:
+        return True
+    if not tokens_a or not tokens_b:
+        return False
+    intersection = tokens_a & tokens_b
+    union = tokens_a | tokens_b
+    return len(intersection) / len(union) >= threshold
+
+def compute_antitrust_field_correct(pred_obj: JsonDict, gold_obj: JsonDict) -> Dict[str, bool]:
+    return {
+        "case_name": match_string_ci(pred_obj["case_name"], gold_obj["case_name"]),
+        "plaintiff": match_string_ci(pred_obj["plaintiff"], gold_obj["plaintiff"]),
+        "defendant": match_string_ci(pred_obj["defendant"], gold_obj["defendant"]),
+        "court": match_string_ci(pred_obj["court"], gold_obj["court"]),
+        "date_filed": match_date(pred_obj["date_filed"], gold_obj["date_filed"]),
+        "cause_of_action": match_enum(pred_obj["cause_of_action"], gold_obj["cause_of_action"]),
+        "statute": match_string_ci(pred_obj["statute"], gold_obj["statute"]),
+        "market_definition": match_fuzzy_string(pred_obj["market_definition"], gold_obj["market_definition"]),
+        "remedy_sought": match_enum(pred_obj["remedy_sought"], gold_obj["remedy_sought"]),
+        "holding": match_enum(pred_obj["holding"], gold_obj["holding"]),
+    }
+
+
+def grade_antitrust(pred_text: str, gold_obj: JsonDict) -> JsonDict:
+    """
+    Grade raw model output text against an antitrust_v1 gold label dict.
+    Same structure as grade_extraction but uses antitrust schema.
+    """
+    gold_id = gold_obj.get("id")
+
+    result: JsonDict = {
+        "gold_id": gold_id,
+        "valid_json": False,
+        "schema_valid": False,
+        "base_score": 0.0,
+        "field_correct": {},
+        "field_scores": {},
+        "total_score": 0.0,
+        "errors": [],
+    }
+
+    pred_obj, parse_errors = parse_pred_object(pred_text, allow_embedded_json=True)
+    if pred_obj is None:
+        result["errors"] = parse_errors
+        return result
+
+    result["valid_json"] = True
+
+    schema_errors = validate_antitrust_schema(pred_obj)
+    if schema_errors:
+        result["errors"] = schema_errors
+        return result
+
+    result["schema_valid"] = True
+    result["base_score"] = ANTITRUST_BASE_SCORE
+
+    field_correct = compute_antitrust_field_correct(pred_obj, gold_obj)
+    field_scores = {f: (ANTITRUST_FIELD_WEIGHTS[f] if ok else 0.0) for f, ok in field_correct.items()}
+    errors = [f"field_mismatch:{f}" for f, ok in field_correct.items() if not ok]
+
+    result["field_correct"] = field_correct
+    result["field_scores"] = field_scores
+    result["total_score"] = max(0.0, min(1.0, ANTITRUST_BASE_SCORE + sum(field_scores.values())))
+    result["errors"] = errors
+    return result

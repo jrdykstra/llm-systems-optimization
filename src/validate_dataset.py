@@ -148,7 +148,6 @@ def main():
     else:
         base = Path(__file__).resolve().parent.parent / "datasets" / args.task_type
 
-
     tasks_path = base / "tasks.jsonl"
     gold_path = base / "gold.jsonl"
 
