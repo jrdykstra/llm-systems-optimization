@@ -35,7 +35,7 @@ def test_validate_tasks_returns_ids():
         (1, {"id": "A0001", "task_type": "extraction_v1", "difficulty": "easy",
              "input": "text", "instruction": "do it"}),
     ]
-    ids = validate_tasks(rows)
+    ids = validate_tasks(rows, TASKS_KEYS, "extraction_v1")
     assert ids == ["A0001"]
 
 
@@ -54,3 +54,12 @@ def test_full_dataset_validates():
     gold = load_jsonl(base / "gold.jsonl")
     assert len(tasks) == len(gold)
     assert len(tasks) >= 30
+
+
+def test_antitrust_dataset_validates():
+    """Integration test: antitrust_v1 dataset files pass validation."""
+    base = Path(__file__).resolve().parent.parent / "datasets" / "antitrust_v1"
+    tasks = load_jsonl(base / "tasks.jsonl")
+    gold = load_jsonl(base / "gold.jsonl")
+    assert len(tasks) == len(gold)
+    assert len(tasks) >= 10

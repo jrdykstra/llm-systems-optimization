@@ -71,12 +71,6 @@ def should_escalate_antitrust(output_text):
     if not any(kw in plaintiff for kw in gov_keywords):
         return True, ["heuristic:plaintiff_not_government"]
 
-    # Heuristic: remedy/holding field confusion — model puts holding values in remedy
-    holding_values = {"guilty_plea", "convicted", "settled", "dismissed", "pending", "approved"}
-    remedy = pred_obj.get("remedy_sought")
-    if remedy in holding_values:
-        return True, ["heuristic:remedy_holding_swap"]
-
     return False, []
 
 

@@ -1,5 +1,5 @@
 import json
-from src.run_cascade import should_escalate
+from src.run_cascade import should_escalate, should_escalate_antitrust
 
 
 def test_valid_schema_no_escalate():
@@ -85,3 +85,40 @@ def test_jurisdiction_other_known_regulator_no_escalate():
     }
     escalate, reasons = should_escalate(json.dumps(obj))
     assert escalate is False
+
+
+def test_antitrust_valid_no_escalate():
+    obj = {
+        "case_name": "United States v. LivCor",
+        "plaintiff": "DOJ Antitrust Division",
+        "defendant": "LivCor",
+        "court": None,
+        "date_filed": None,
+        "cause_of_action": "algorithmic_pricing",
+        "statute": None,
+        "market_definition": "residential rental market",
+        "remedy_sought": "consent_decree",
+        "holding": "settled",
+    }
+    escalate, reasons = should_escalate_antitrust(json.dumps(obj))
+    assert escalate is False
+
+
+def test_antitrust_plaintiff_not_government_escalates():
+    obj = {
+        "case_name": "United States v. LivCor",
+        "plaintiff": "LivCor",
+        "defendant": "DOJ Antitrust Division",
+        "court": None,
+        "date_filed": None,
+        "cause_of_action": "algorithmic_pricing",
+        "statute": None,
+        "market_definition": "residential rental market",
+        "remedy_sought": "consent_decree",
+        "holding": "settled",
+    }
+    escalate, reasons = should_escalate_antitrust(json.dumps(obj))
+    assert escalate is True
+    assert "heuristic:plaintiff_not_government" in reasons
+
+
